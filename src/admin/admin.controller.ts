@@ -6,6 +6,7 @@ import AdminService from './admin.service';
 @Controller('/admin/:id')
 @UseGuards(AdminRouteGuard)
 export default class AdminController {
+    
     constructor(private readonly adminService: AdminService) {}
 
     @Get('/')
