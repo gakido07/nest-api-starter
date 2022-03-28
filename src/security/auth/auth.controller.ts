@@ -49,6 +49,4 @@ export default class AuthController {
         const { userId, refreshToken } = request;
         return await this.authService.refreshToken(refreshToken, userId);
     }
-
-    
 }

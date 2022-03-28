@@ -32,7 +32,7 @@ export default class EmailVerification {
     constructor(email: string, role: string) {
         this.email = email;
         this.verificationCode = generateVerificationcode();
-        this.verified = true;
+        this.verified = false;
         this.role = role;
     }
 }
