@@ -12,11 +12,12 @@ import jwt from 'jsonwebtoken';
 
 import { DecodeJwtError } from 'src/exception/jwt.exceptions';
 import SubRouteGuard from 'src/security/auth/guards/interface/route.guard';
-import JwtUtil from '../jwt/jwt.util';
-import SecurityUtil from 'src/security/security.util';
+import JwtUtil from '../../util/jwt.util';
+import SecurityUtil from 'src/security/util/security.util';
 
 @Injectable()
-export class AdminRouteGuard extends AuthGuard('jwt') implements SubRouteGuard {
+export default class AdminRouteGuard extends AuthGuard('jwt') implements SubRouteGuard {
+    
     private readonly logger = new Logger(AdminRouteGuard.name);
 
     constructor(private jwtUtil: JwtUtil, private securityUtil: SecurityUtil) {
@@ -53,7 +54,8 @@ export class AdminRouteGuard extends AuthGuard('jwt') implements SubRouteGuard {
         const sub = this.jwtUtil.extractClaimFromToken(token, 'sub');
         const role = this.jwtUtil.extractClaimFromToken(token, 'role');
 
-        if (role !== 'ADMIN') {
+
+        if (!["ADMIN", "SUPER_ADMIN"].includes(role)) {
             throw new UnauthorizedException(this.getUnauthorizedMessage());
         }
         if (sub.toString() !== routeUserId) {

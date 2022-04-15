@@ -12,9 +12,10 @@ import jwt from 'jsonwebtoken';
 import { AdminDocument } from 'src/admin/admin';
 import { InvalidRefreshToken } from 'src/exception/auth.exceptions';
 import { DecodeJwtError } from 'src/exception/jwt.exceptions';
-import { UserDocument } from '../../../user/user';
+import { UserDocument } from '../../user/user';
 
 type AppUserDocument = AdminDocument | UserDocument;
+
 
 @Injectable()
 export default class JwtUtil {

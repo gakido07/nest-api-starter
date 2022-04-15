@@ -1,13 +1,10 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import User, { UserDocument } from './user';
-import {
-    UserExistsException,
-    UserNotFoundException,
-} from '../exception/auth.exceptions';
+import { UserExistsException, UserNotFoundException } from '../exception/auth.exceptions';
 import { SignUpRequest } from 'src/security/auth/auth.dto';
 import UserRepository from './user.repository';
-import EmailverificationService from './emailVerification/email.verification.service';
-import SecurityUtil from 'src/security/security.util';
+import VerificationService from './verification/verification.service';
+import SecurityUtil from 'src/security/util/security.util';
 import { UnverifiedEmailException } from 'src/exception/email.verification.exceptions';
 import { UserDto } from './user.dto';
 
@@ -24,7 +21,7 @@ export default class UserServiceImpl implements UserService {
     private readonly logger = new Logger(UserServiceImpl.name);
 
     constructor(
-        private emailVerificationService: EmailverificationService,
+        private verificationService: VerificationService,
         private securityUtil: SecurityUtil,
         private userRepository: UserRepository,
     ) {}
@@ -57,16 +54,12 @@ export default class UserServiceImpl implements UserService {
     async signUpUser(signUpRequest: SignUpRequest): Promise<UserDto> {
         
 
-        if (await this.userRepository.userExists(signUpRequest.email))
-            throw new UserExistsException('email already registered');
+        if (await this.userRepository.userExists(signUpRequest.email)) throw new UserExistsException('email already registered');
 
-        const emailVerification = await this.emailVerificationService.loadVerificationRecord(signUpRequest.email);
+        const emailVerification = await this.verificationService.loadVerificationRecord(signUpRequest.email);
 
         if (!emailVerification.verified)
-            throw new UnverifiedEmailException(`email ${emailVerification.email} not verified`);
-
-        if (emailVerification.role !== 'USER')
-            throw new HttpException('Invalid Request', HttpStatus.BAD_REQUEST);
+            throw new UnverifiedEmailException(`email ${emailVerification.info} not verified`);
 
         const {
             password,
@@ -83,13 +76,11 @@ export default class UserServiceImpl implements UserService {
             signUpRequest.password,
         ));
 
-        await this.emailVerificationService.deleteVerificationRecord(
+        await this.verificationService.deleteVerificationRecord(
             signUpRequest.email,
         );
 
-        this.logger.log(
-            `new user signed up with email: ${signUpRequest.email} `,
-        );
+        this.logger.log(`new user signed up with email: ${signUpRequest.email} `);
 
         return new UserDto(newUser);
     }

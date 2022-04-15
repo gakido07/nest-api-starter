@@ -7,6 +7,7 @@ export type AdminDocument = Admin & Document;
 
 @Schema()
 export default class Admin {
+    
     @Prop({ type: String, required: true })
     firstName: string;
 

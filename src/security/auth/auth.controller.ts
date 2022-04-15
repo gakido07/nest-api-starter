@@ -4,10 +4,10 @@ import { Request } from 'express';
 import AuthDto, { LoginRequest, RefreshTokenRequest, SignUpRequest } from './auth.dto';
 import AuthService from './auth.service';
 import { Public } from 'src/config/util/decorators';
-import { EmailVerificationRequest, VerifyCodeRequest } from 'src/user/emailVerification/email.verification.dto';
-import EmailVerification from 'src/user/emailVerification/email.verification';
+import { EmailVerificationRequest, VerifyCodeRequest } from 'src/user/verification/verification.dto';
+import EmailVerification from 'src/user/verification/verification';
 import { UserDto } from 'src/user/user.dto';
-import { EmailVerificationGuard } from './guards/email.verification.guard';
+import VerificationGuard from './guards/verification.guard';
 import { AdminAuthDto } from 'src/admin/admin.dto';
 
 @Controller('/auth')
@@ -27,7 +27,7 @@ export default class AuthController {
     }
 
     @Post('/email-verification/')
-    @UseGuards(EmailVerificationGuard)
+    @UseGuards(VerificationGuard)
     async sendVerificationMail(@Body() emailVerificationRequest: EmailVerificationRequest): Promise<string> {
         const { email } = emailVerificationRequest;
         return await this.authService.sendEmailVerificationMail(email);

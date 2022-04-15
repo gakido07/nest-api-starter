@@ -2,7 +2,7 @@ import { Body, Injectable, Logger } from '@nestjs/common';
 
 import UserService from 'src/user/user.service';
 import { LoginRequest, SignUpRequest } from './auth.dto';
-import JwtUtil, { Claims } from './jwt/jwt.util';
+import JwtUtil, { Claims } from '../util/jwt.util';
 import AuthDto from './auth.dto';
 import User, { UserDocument } from 'src/user/user';
 import {
@@ -10,13 +10,13 @@ import {
     InvalidRefreshToken,
     UserExistsException,
 } from 'src/exception/auth.exceptions';
-import SecurityUtil from '../security.util';
+import SecurityUtil from '../util/security.util';
 import { AdminAuthDto } from 'src/admin/admin.dto';
 import Admin, { AdminDocument } from 'src/admin/admin';
 import AdminService from 'src/admin/admin.service';
-import { EmailVerificationRequest, VerifyCodeRequest } from 'src/user/emailVerification/email.verification.dto';
-import EmailVerification from 'src/user/emailVerification/email.verification';
-import EmailverificationService from 'src/user/emailVerification/email.verification.service';
+import { VerifyCodeRequest } from 'src/user/verification/verification.dto';
+import Verification from 'src/user/verification/verification';
+import VerificationService from 'src/user/verification/verification.service';
 import { UserDto } from 'src/user/user.dto';
 
 interface AuthService {
@@ -30,12 +30,13 @@ interface AuthService {
 
 @Injectable()
 export default class AuthServiceImpl implements AuthService {
+
     private readonly logger = new Logger(AuthServiceImpl.name);
 
     constructor(
         private userService: UserService,
         private adminService: AdminService,
-        private emailVerificationService: EmailverificationService,
+        private verificationService: VerificationService,
         private jwtUtil: JwtUtil,
         private securityUtil: SecurityUtil,
     ) {}
@@ -43,9 +44,7 @@ export default class AuthServiceImpl implements AuthService {
     async authenticateAdmin(loginRequest: LoginRequest): Promise<AdminAuthDto> {
         const { email, password } = loginRequest;
 
-        const admin: AdminDocument = await this.adminService.findAdminByEmail(
-            email,
-        );
+        const admin: AdminDocument = await this.adminService.findAdminByEmail(email);
 
         if (!this.securityUtil.passwordEncoder().match(password, admin.password)) {
             throw new FailedAuthentication('Invalid username or passsword');
@@ -65,9 +64,7 @@ export default class AuthServiceImpl implements AuthService {
         this.jwtUtil.generateJwt<UserDocument>(user);
 
         if (!this.securityUtil.passwordEncoder().match(password, user.password)) {
-            this.logger.log(
-                `Failed authentication attempt for user with email ${email}`,
-            );
+            this.logger.log(`Failed authentication attempt for user with email ${email}`);
             throw new FailedAuthentication('Invalid username or passsword');
         }
 
@@ -87,28 +84,23 @@ export default class AuthServiceImpl implements AuthService {
     async refreshToken(refreshToken: string, userId: string): Promise<{ accessToken: string }> {
         const user = await this.userService.findUserById(userId);
         const claims = this.jwtUtil.verifyJwt(refreshToken);
-
         if(claims.jti !== user.refreshTokenId) {
             throw new InvalidRefreshToken("Invalid refresh token");
         }
-
         return {
             accessToken: this.jwtUtil.generateJwt(user),
         };
     }
 
-
     async signUpUser(signUpRequest: SignUpRequest): Promise<UserDto> {
         return await this.userService.signUpUser(signUpRequest);
     }
 
-    async verifyCode(email: string, code: number): Promise<EmailVerification> {
-        return await this.emailVerificationService.verifyCode(email, code);
+    async verifyCode(info: string, code: number): Promise<Verification> {
+        return await this.verificationService.verifyCode(info, code);
     }
 
-    async sendEmailVerificationMail(
-        email: string
-    ): Promise<string> {
-        return await this.emailVerificationService.sendVerificationEmail(email, 'USER');
+    async sendEmailVerificationMail(email: string): Promise<string> {
+        return await this.verificationService.sendVerificationEmail(email);
     }
 }

@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsNumber, Max, Min } from 'class-validator';
+import { IsEmail, IsIBAN, IsIn, IsNotEmpty, IsNumber, Max, Min } from 'class-validator';
 
 export class EmailVerificationRequest {
     @IsEmail()

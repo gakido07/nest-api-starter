@@ -6,30 +6,29 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import AuthController from './auth.controller';
 import UserModule from 'src/user/user.module';
 import AuthService from './auth.service';
-import SecurityModule from '../security.module';
-import { AdminModule } from 'src/admin/admin.module';
-import EmailVerificationRepository from 'src/user/emailVerification/email.verification.repository';
-import EmailverificationService from 'src/user/emailVerification/email.verification.service';
-import EmailVerification, { EmailverificationSchema } from 'src/user/emailVerification/email.verification';
+import AdminModule from 'src/admin/admin.module';
+import VerificationRepository from 'src/user/verification/verification.repository';
+import VerificationService from 'src/user/verification/verification.service';
+import Verification, { VerificationSchema } from 'src/user/verification/verification';
 import EmailSenderImpl from 'src/config/email/email.sender';
 
 @Module({
-    imports: [PassportModule, 
+    imports: [
+        PassportModule, 
         UserModule, 
-        SecurityModule,
         AdminModule,
         MongooseModule.forFeature([
-            { name: EmailVerification.name, schema: EmailverificationSchema },
+            { name: Verification.name, schema: VerificationSchema },
         ]),
     ],
     providers: [
-        AuthService, 
+        AuthService,
         JwtStrategy,
-        EmailVerificationRepository,
-        EmailverificationService,
-        EmailSenderImpl
+        VerificationRepository,
+        VerificationService,
+        EmailSenderImpl,
     ],
     exports: [AuthService],
     controllers: [AuthController],
 })
-export class AuthModule {}
+export default class AuthModule {}

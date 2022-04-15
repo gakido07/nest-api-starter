@@ -4,15 +4,21 @@ import mongoose, { Document } from 'mongoose';
 export type UserDocument = User & Document;
 
 @Schema({
-    autoCreate: true,
+    autoCreate: true
 })
 export default class User {
+
     //TODO write email regex validation
 
-    @Prop({ type: String, lowercase: true, required: true, unique: true })
+    @Prop({ 
+        type: String,
+        lowercase: true, 
+        required: true,
+        unique: true 
+    })
     email: string;
 
-    @Prop({ type: String, required: true})
+    @Prop({ type: String, required: true })
     password: string;
 
     @Prop({ required: true, type: Boolean })
@@ -21,10 +27,7 @@ export default class User {
     @Prop({ type: String })
     refreshTokenId: string;
 
-    constructor(
-        email: string,
-        password: string
-    ) {
+    constructor (email: string, password: string) {
         this.email = email;
         this.password = password;
         this.accountLocked = false;

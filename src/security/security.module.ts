@@ -1,9 +1,10 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 
-import JwtUtil from './auth/jwt/jwt.util';
-import SecurityUtil from './security.util';
+import JwtUtil from './util/jwt.util';
+import SecurityUtil from './util/security.util';
 
+@Global()
 @Module({
     controllers: [],
     imports: [

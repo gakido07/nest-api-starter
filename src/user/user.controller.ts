@@ -3,7 +3,7 @@ import { Request } from 'express';
 
 import UserService from './user.service';
 import User, { UserDocument } from './user';
-import { UserRouteGuard } from 'src/security/auth/guards/user.route.guard';
+import UserRouteGuard from 'src/security/auth/guards/user.route.guard';
 import { UserDto } from './user.dto';
 
 @Controller('/users/:id')

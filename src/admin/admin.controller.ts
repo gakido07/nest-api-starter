@@ -1,5 +1,6 @@
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
-import { AdminRouteGuard } from 'src/security/auth/guards/admin.route.guard';
+
+import AdminRouteGuard from 'src/security/auth/guards/admin.route.guard';
 import { AdminDto } from './admin.dto';
 import AdminService from './admin.service';
 

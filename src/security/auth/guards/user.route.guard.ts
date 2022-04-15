@@ -11,14 +11,15 @@ import { AuthGuard } from '@nestjs/passport';
 import jwt, { Jwt } from 'jsonwebtoken';
 import { Request } from 'express';
 
-import JwtUtil from '../jwt/jwt.util';
+import JwtUtil from '../../util/jwt.util';
 import { InvalidGuardForRouteException } from 'src/exception/auth.exceptions';
-import SecurityUtil from 'src/security/security.util';
+import SecurityUtil from 'src/security/util/security.util';
 import { DecodeJwtError } from 'src/exception/jwt.exceptions';
 import RouteGuard from 'src/security/auth/guards/interface/route.guard';
 
 @Injectable()
-export class UserRouteGuard extends AuthGuard('jwt') implements RouteGuard {
+export default class UserRouteGuard extends AuthGuard('jwt') implements RouteGuard {
+
     private readonly logger = new Logger(UserRouteGuard.name);
 
     constructor(private jwtUtil: JwtUtil, private securityUtil: SecurityUtil) {

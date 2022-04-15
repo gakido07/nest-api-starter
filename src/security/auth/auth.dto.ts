@@ -19,8 +19,14 @@ export default class AuthDto {
     }
 }
 
-export interface LoginRequest {
+export class LoginRequest {
+    @IsEmail()
+    @IsString()
+    @IsNotEmpty()
     email: string;
+
+    @IsString()
+    @IsNotEmpty()
     password: string;
 }
 
