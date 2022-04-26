@@ -46,7 +46,7 @@ export default class AuthServiceImpl implements AuthService {
 
         const admin: AdminDocument = await this.adminService.findAdminByEmail(email);
 
-        if (!this.securityUtil.passwordEncoder().match(password, admin.password)) {
+        if (! await this.securityUtil.passwordEncoder().match(password, admin.password)) {
             throw new FailedAuthentication('Invalid username or passsword');
         }
 
