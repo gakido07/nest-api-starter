@@ -63,7 +63,7 @@ export default class AuthServiceImpl implements AuthService {
         const user = await this.userService.findUserByEmail(loginRequest.email);
         this.jwtUtil.generateJwt<UserDocument>(user);
 
-        if (!this.securityUtil.passwordEncoder().match(password, user.password)) {
+        if (! await this.securityUtil.passwordEncoder().match(password, user.password)) {
             this.logger.log(`Failed authentication attempt for user with email ${email}`);
             throw new FailedAuthentication('Invalid username or passsword');
         }
