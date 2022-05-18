@@ -24,7 +24,6 @@ export class LoggingInterceptor implements NestInterceptor {
         this.logger.log(
             `${request.method} request made to {url:${request.url}}`,
         );
-        this.logger.log(`Response status: ${response.statusCode.toString()}`);
 
         return next.handle().pipe(tap());
     }
