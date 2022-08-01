@@ -7,11 +7,10 @@ import AdminService from './admin.service';
 @Controller('/admin/:id')
 @UseGuards(AdminRouteGuard)
 export default class AdminController {
-    
-    constructor(private readonly adminService: AdminService) {}
+  constructor(private readonly adminService: AdminService) {}
 
-    @Get('/')
-    async getAdminDto(@Param('id') id: string): Promise<AdminDto> {
-        return new AdminDto(await this.adminService.findAdminById(id));
-    }
+  @Get('/')
+  async getAdminDto(@Param('id') id: string): Promise<AdminDto> {
+    return new AdminDto(await this.adminService.findAdminById(id));
+  }
 }

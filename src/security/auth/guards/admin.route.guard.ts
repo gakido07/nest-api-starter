@@ -1,74 +1,51 @@
 import {
-    ExecutionContext,
-    HttpException,
-    HttpStatus,
-    Injectable,
-    Logger,
-    UnauthorizedException,
+  ExecutionContext,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  Logger,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import jwt from 'jsonwebtoken';
 
 import { DecodeJwtError } from 'src/exception/jwt.exceptions';
-import SubRouteGuard from 'src/security/auth/guards/interface/route.guard';
 import JwtUtil from '../../util/jwt.util';
 import SecurityUtil from 'src/security/util/security.util';
 
 @Injectable()
-export default class AdminRouteGuard extends AuthGuard('jwt') implements SubRouteGuard {
-    
-    private readonly logger = new Logger(AdminRouteGuard.name);
+export default class AdminRouteGuard extends AuthGuard('jwt') {
+  private readonly logger = new Logger(AdminRouteGuard.name);
 
-    constructor(private jwtUtil: JwtUtil, private securityUtil: SecurityUtil) {
-        super();
+  constructor(private jwtUtil: JwtUtil) {
+    super();
+  }
+
+  canActivate(context: ExecutionContext) {
+    const request: Request = context.getArgByIndex(0);
+    let token: string = null;
+
+    try {
+      token = request.header('Authorization').substring(7, request.header('Authorization').length);
+    } catch (error) {
+      this.logger.error('Unable to extract jwt for request');
+      throw new UnauthorizedException('You seem lost');
     }
 
-    getUrlSubRoute(): string {
-        return 'admin';
+    const sub = this.jwtUtil.extractClaimFromToken(token, 'sub');
+    const role = this.jwtUtil.extractClaimFromToken(token, 'role');
+
+    if (!['ADMIN', 'SUPER_ADMIN'].includes(role)) {
+      throw new UnauthorizedException('You seem lost');
     }
+    return super.canActivate(context);
+  }
 
-    getUnauthorizedMessage(): string {
-        return 'You seem lost';
+  handleRequest(err, user, info) {
+    if (err || !user) {
+      throw err || new UnauthorizedException();
     }
-
-    canActivate(context: ExecutionContext) {
-        const request: Request = context.getArgByIndex(0);
-        let token: string = null;
-
-        try {
-            token = request
-                .header('Authorization')
-                .substring(7, request.header('Authorization').length);
-        } catch (error) {
-            this.logger.error('Unable to extract jwt for request');
-            throw new UnauthorizedException(this.getUnauthorizedMessage());
-        }
-
-        const routeUserId: string =
-            this.securityUtil.extractUserIdFromUserRoute(
-                request.url,
-                this.getUrlSubRoute(),
-            );
-
-        const sub = this.jwtUtil.extractClaimFromToken(token, 'sub');
-        const role = this.jwtUtil.extractClaimFromToken(token, 'role');
-
-
-        if (!["ADMIN", "SUPER_ADMIN"].includes(role)) {
-            throw new UnauthorizedException(this.getUnauthorizedMessage());
-        }
-        if (sub.toString() !== routeUserId) {
-            throw new UnauthorizedException(this.getUnauthorizedMessage());
-        }
-
-        return super.canActivate(context);
-    }
-
-    handleRequest(err, user, info) {
-        if (err || !user) {
-            throw err || new UnauthorizedException();
-        }
-        return user;
-    }
+    return user;
+  }
 }

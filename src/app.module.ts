@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
 
@@ -7,6 +7,7 @@ import JwtAuthGuard from './security/auth/guards/jwt.auth.guard';
 import UserModule from './user/user.module';
 import AuthModule from './security/auth/auth.module';
 import SecurityModule from './security/security.module';
+import { LoggingMiddleware } from './common/middleware/logging.middleware';
 
 @Module({
   imports: [
@@ -14,14 +15,19 @@ import SecurityModule from './security/security.module';
     UserModule,
     AdminModule,
     AuthModule,
-    SecurityModule
+    SecurityModule,
   ],
   controllers: [],
   providers: [
     {
       provide: APP_GUARD,
-      useClass: JwtAuthGuard
+      useClass: JwtAuthGuard,
     },
   ],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggingMiddleware)
+      .forRoutes('/')
+  }
+}

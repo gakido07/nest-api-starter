@@ -3,26 +3,22 @@ import { AuthGuard } from "@nestjs/passport";
 import { Observable } from "rxjs";
 import { Request } from 'express';
 
-import UserServiceImpl from "src/user/user.service";
-import RouteGuard from "./interface/route.guard";
-import { EmailVerificationRequest } from "src/user/verification/verification.dto";
-import { UserExistsException } from "src/exception/auth.exceptions";
+import UserService from "src/user/user.service";
 
 @Injectable()
 export default class VerificationGuard implements CanActivate {
 
-    constructor(private userService: UserServiceImpl) {}
+    constructor(private userService: UserService) {}
 
     canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
-        const request: Request = context.getArgByIndex(0);
+        const request: Request = context.switchToHttp().getRequest();
 
-        const verificationPayload: EmailVerificationRequest = request.body;
+
+        const verificationPayload = request.body;
 
         const { email } = verificationPayload;
 
-        const type: string = 'EMAIL';
-
-        console.log(type);
+        const type: string = request.url.endsWith("email") ? 'EMAIL' : "PHONE_NUMBER";
 
         switch (type) {
             case 'EMAIL': {
@@ -37,7 +33,7 @@ export default class VerificationGuard implements CanActivate {
                     })
                 });
             }
-            case 'NUMBER': {
+            case 'PHONE_NUMBER': {
 
             }
 

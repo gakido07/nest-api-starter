@@ -1,4 +1,4 @@
-import { Body, Injectable, Logger } from '@nestjs/common';
+import { Body, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 
 import UserService from 'src/user/user.service';
 import { LoginRequest, SignUpRequest } from './auth.dto';
@@ -6,101 +6,97 @@ import JwtUtil, { Claims } from '../util/jwt.util';
 import AuthDto from './auth.dto';
 import User, { UserDocument } from 'src/user/user';
 import {
-    FailedAuthentication,
-    InvalidRefreshToken,
-    UserExistsException,
+  FailedAuthentication,
+  InvalidRefreshToken,
+  UserExistsException,
+  UserNotFoundException,
 } from 'src/exception/auth.exceptions';
 import SecurityUtil from '../util/security.util';
 import { AdminAuthDto } from 'src/admin/admin.dto';
 import Admin, { AdminDocument } from 'src/admin/admin';
 import AdminService from 'src/admin/admin.service';
-import { VerifyCodeRequest } from 'src/user/verification/verification.dto';
-import Verification from 'src/user/verification/verification';
-import VerificationService from 'src/user/verification/verification.service';
+import { VerifyCodeRequest } from 'src/verification/verification.dto';
+import Verification from 'src/verification/verification';
+import VerificationService from 'src/verification/verification.service';
 import { UserDto } from 'src/user/user.dto';
 
-interface AuthService {
-    authenticateUser(loginRequest: LoginRequest): Promise<AuthDto>;
-    refreshToken(
-        refreshToken: string,
-        userId: string,
-    ): Promise<{ accessToken: string }>;
-    authenticateAdmin(loginRequest: LoginRequest): Promise<AdminAuthDto>;
-}
-
 @Injectable()
-export default class AuthServiceImpl implements AuthService {
+export default class AuthService {
+  private readonly logger = new Logger(AuthService.name);
 
-    private readonly logger = new Logger(AuthServiceImpl.name);
+  constructor(
+    private userService: UserService,
+    private adminService: AdminService,
+    private verificationService: VerificationService,
+    private jwtUtil: JwtUtil,
+    private securityUtil: SecurityUtil
+  ) {}
 
-    constructor(
-        private userService: UserService,
-        private adminService: AdminService,
-        private verificationService: VerificationService,
-        private jwtUtil: JwtUtil,
-        private securityUtil: SecurityUtil,
-    ) {}
+  async authenticateAdmin(loginRequest: LoginRequest): Promise<AdminAuthDto> {
+    const { email, password } = loginRequest;
 
-    async authenticateAdmin(loginRequest: LoginRequest): Promise<AdminAuthDto> {
-        const { email, password } = loginRequest;
+    const admin: AdminDocument = await this.adminService.findAdminByEmail(email);
 
-        const admin: AdminDocument = await this.adminService.findAdminByEmail(email);
-
-        if (! await this.securityUtil.passwordEncoder().match(password, admin.password)) {
-            throw new FailedAuthentication('Invalid username or passsword');
-        }
-
-        return {
-            id: admin.id,
-            email: admin.email,
-            accessToken: this.jwtUtil.generateJwt(admin),
-        };
+    if (!(await this.securityUtil.passwordEncoder().match(password, admin.password))) {
+      throw new FailedAuthentication('Invalid username or passsword');
     }
 
-    async authenticateUser(loginRequest: LoginRequest): Promise<AuthDto> {
-        const { email, password } = loginRequest;
+    return {
+      id: admin.id,
+      email: admin.email,
+      accessToken: this.jwtUtil.generateJwt(admin),
+    };
+  }
 
-        const user = await this.userService.findUserByEmail(loginRequest.email);
-        this.jwtUtil.generateJwt<UserDocument>(user);
+  async authenticateUser(loginRequest: LoginRequest): Promise<AuthDto> {
+    const { email, password } = loginRequest;
 
-        if (! await this.securityUtil.passwordEncoder().match(password, user.password)) {
-            this.logger.log(`Failed authentication attempt for user with email ${email}`);
-            throw new FailedAuthentication('Invalid username or passsword');
-        }
+    const user = await this.userService.findUserByEmail({
+      email: email,
+      exception: new UnauthorizedException("Invalid username or password")
+    });
+    this.jwtUtil.generateJwt<UserDocument>(user);
 
-        const { refreshToken, jti } = this.jwtUtil.generateRefreshToken(user);
-        user.refreshTokenId = jti;
-        user.save();
-
-        return {
-            id: user.id,
-            email: user.email,
-            accessToken: this.jwtUtil.generateJwt(user),
-            refreshToken: refreshToken,
-        };
+    if (!(await this.securityUtil.passwordEncoder().match(password, user.password))) {
+      this.logger.log(`Failed authentication attempt for user with email ${email}`);
+      throw new UnauthorizedException('Invalid username or passsword');
     }
 
+    const { refreshToken, jti } = this.jwtUtil.generateRefreshToken(user);
+    user.refreshTokenId = jti;
+    user.save();
 
-    async refreshToken(refreshToken: string, userId: string): Promise<{ accessToken: string }> {
-        const user = await this.userService.findUserById(userId);
-        const claims = this.jwtUtil.verifyJwt(refreshToken);
-        if(claims.jti !== user.refreshTokenId) {
-            throw new InvalidRefreshToken("Invalid refresh token");
-        }
-        return {
-            accessToken: this.jwtUtil.generateJwt(user),
-        };
-    }
+    return {
+      id: user.id,
+      email: user.email,
+      accessToken: this.jwtUtil.generateJwt(user),
+      refreshToken: refreshToken,
+    };
+  }
 
-    async signUpUser(signUpRequest: SignUpRequest): Promise<UserDto> {
-        return await this.userService.signUpUser(signUpRequest);
+  async refreshToken(refreshToken: string, userId: string): Promise<{ accessToken: string }> {
+    const user = await this.userService.findUserById({
+      id: userId,
+      exception: new UnauthorizedException("Invalid username or password") 
+    });
+    const claims = this.jwtUtil.verifyJwt(refreshToken);
+    if (claims.jti !== user.refreshTokenId) {
+      throw new InvalidRefreshToken('Invalid refresh token');
     }
+    return {
+      accessToken: this.jwtUtil.generateJwt(user),
+    };
+  }
 
-    async verifyCode(info: string, code: number): Promise<Verification> {
-        return await this.verificationService.verifyCode(info, code);
-    }
+  async signUpUser(signUpRequest: SignUpRequest): Promise<UserDto> {
+    return await this.userService.signUpUser(signUpRequest);
+  }
 
-    async sendEmailVerificationMail(email: string): Promise<string> {
-        return await this.verificationService.sendVerificationEmail(email);
-    }
+  async verifyCode(info: string, code: number): Promise<Verification> {
+    return await this.verificationService.verifyCode(info, code);
+  }
+
+  async sendEmailVerificationMail(email: string): Promise<string> {
+    return await this.verificationService.sendVerificationEmail(email);
+  }
 }

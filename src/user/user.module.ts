@@ -5,35 +5,27 @@ import UserController from './user.controller';
 import UserRepository from './user.repository';
 import User, { UserSchema } from './user';
 import UserService from './user.service';
-import VerificationService from './verification/verification.service';
-import VerificationRepository from './verification/verification.repository';
-import Verification, {
-    VerificationSchema,
-} from './verification/verification';
+import VerificationService from '../verification/verification.service';
+import VerificationRepository from '../verification/verification.repository';
+import Verification, { VerificationSchema } from '../verification/verification';
 import EmailSender from 'src/config/email/email.sender';
 import SecurityUtil from 'src/security/util/security.util';
+import VerificationModule from 'src/verification/verification.module';
 
 @Module({
-    imports: [
-        MongooseModule.forFeature([
-            { name: User.name, schema: UserSchema },
-            { name: Verification.name, schema: VerificationSchema },
-        ]),
-    ],
-    controllers: [UserController],
-    providers: [
-        // Services
-        UserService,
-        VerificationService,
-
-        // Repositories
-        UserRepository,
-        VerificationRepository,
-
-        // Util
-        SecurityUtil,
-        EmailSender,
-    ],
-    exports: [UserService, UserRepository],
+  imports: [
+    MongooseModule.forFeature([
+      { name: User.name, schema: UserSchema },
+    ]),
+    VerificationModule
+  ],
+  controllers: [UserController],
+  providers: [
+    UserService,
+    UserRepository,
+    SecurityUtil,
+    EmailSender,
+  ],
+  exports: [UserService],
 })
 export default class UserModule {}

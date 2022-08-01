@@ -1,25 +1,17 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
 import EmailSender from 'src/config/email/email.sender';
-import {
-    UserExistsException,
-    UserNotFoundException,
-} from 'src/exception/auth.exceptions';
+import { UserExistsException, UserNotFoundException } from 'src/exception/auth.exceptions';
 import { UnverifiedEmailException } from 'src/exception/email.verification.exceptions';
 import SecurityUtil from 'src/security/util/security.util';
-import VerificationService from 'src/user/verification/verification.service';
+import VerificationService from 'src/verification/verification.service';
 import Admin, { AdminDocument } from './admin';
 import { SignUpAdminRequest } from './admin.dto';
 import AdminRepository from './admin.repository';
 
-interface AdminService {
-    findAdminByEmail(email: string): Promise<AdminDocument>;
-    signUpAdmin(signUpAdminRequest: SignUpAdminRequest): Promise<Admin>;
-    findAdminById(id: string): Promise<AdminDocument>;
-}
 
 @Injectable()
-export default class AdminServiceImpl implements AdminService {
+export default class AdminService {
     constructor(
         private adminRepository: AdminRepository,
         private securityUtil: SecurityUtil,
@@ -36,7 +28,7 @@ export default class AdminServiceImpl implements AdminService {
         const verification = await this.emailVerificationService.loadVerificationRecord(email);
 
         if (!verification.verified)
-            throw new UnverifiedEmailException(`email ${verification.info} not verified`);
+            throw new UnverifiedEmailException(`email ${verification.data} not verified`);
 
         if (await this.adminRepository.adminExists(email))
             throw new UserExistsException('server cannot process request');
