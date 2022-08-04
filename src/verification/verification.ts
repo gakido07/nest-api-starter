@@ -38,6 +38,4 @@ export default class Verification {
 
 export const VerificationSchema = SchemaFactory.createForClass(Verification);
 
-VerificationSchema.index(
-  {createdAt: 1}, { expireAfterSeconds: 600 }
-);
+VerificationSchema.index({ createdAt: 1 }, { expireAfterSeconds: 600 });

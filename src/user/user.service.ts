@@ -60,12 +60,10 @@ export default class UserService {
       signUpRequest.email
     );
 
-    console.log(emailVerification);
-
     if (!emailVerification.verified)
       throw new UnverifiedEmailException(`email ${emailVerification.data} not verified`);
 
-    const {firstName, lastName, password } = signUpRequest;
+    const { firstName, lastName, password } = signUpRequest;
 
     signUpRequest.password = await this.securityUtil.passwordEncoder().encode(password);
 

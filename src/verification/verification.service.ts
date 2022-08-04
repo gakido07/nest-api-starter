@@ -9,10 +9,7 @@ import {
 } from '../exception/email.verification.exceptions';
 import Verification from './verification';
 import VerificationRepository from './verification.repository';
-import {
-  generateVerificationcode,
-} from './verification.util';
-
+import { generateVerificationcode } from './verification.util';
 
 @Injectable()
 export default class VerificationService {
@@ -70,7 +67,7 @@ export default class VerificationService {
         'Nest Api Template Email Verification',
         await renderFile('src/config/email/templates/email.verification.html', {
           appName: 'Nest Api Template',
-          code: emailVerification.code
+          code: emailVerification.code,
         })
       );
 
@@ -80,7 +77,7 @@ export default class VerificationService {
       this.logger.error(`${error.message}`);
       await this.verificationRepository
         .deleteVerificationRecordByData(data)
-        .catch(error => this.logger.error('Verification clean up failed for data', data));
+        .catch(error => this.logger.error('Verification clean up failed for data', {error: error, data: data}));
       throw new FailedEmailException('Email sending failed');
     }
     return emailVerification.data;

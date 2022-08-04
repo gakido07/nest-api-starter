@@ -5,17 +5,11 @@ import { LoginRequest, SignUpRequest } from './auth.dto';
 import JwtUtil, { Claims } from '../util/jwt.util';
 import AuthDto from './auth.dto';
 import User, { UserDocument } from 'src/user/user';
-import {
-  FailedAuthentication,
-  InvalidRefreshToken,
-  UserExistsException,
-  UserNotFoundException,
-} from 'src/exception/auth.exceptions';
+import { FailedAuthentication, InvalidRefreshToken } from 'src/exception/auth.exceptions';
 import SecurityUtil from '../util/security.util';
 import { AdminAuthDto } from 'src/admin/admin.dto';
 import Admin, { AdminDocument } from 'src/admin/admin';
 import AdminService from 'src/admin/admin.service';
-import { VerifyCodeRequest } from 'src/verification/verification.dto';
 import Verification from 'src/verification/verification';
 import VerificationService from 'src/verification/verification.service';
 import { UserDto } from 'src/user/user.dto';
@@ -53,7 +47,7 @@ export default class AuthService {
 
     const user = await this.userService.findUserByEmail({
       email: email,
-      exception: new UnauthorizedException("Invalid username or password")
+      exception: new UnauthorizedException('Invalid username or password'),
     });
     this.jwtUtil.generateJwt<UserDocument>(user);
 
@@ -77,7 +71,7 @@ export default class AuthService {
   async refreshToken(refreshToken: string, userId: string): Promise<{ accessToken: string }> {
     const user = await this.userService.findUserById({
       id: userId,
-      exception: new UnauthorizedException("Invalid username or password") 
+      exception: new UnauthorizedException('Invalid username or password'),
     });
     const claims = this.jwtUtil.verifyJwt(refreshToken);
     if (claims.jti !== user.refreshTokenId) {

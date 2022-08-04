@@ -1,14 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsEmail,
-  IsJWT,
-  IsMongoId,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  IsUrl,
-  Length,
-} from 'class-validator';
+import { IsEmail, IsJWT, IsMongoId, IsNotEmpty, IsString } from 'class-validator';
 
 export default class AuthDto {
   @ApiProperty()
@@ -16,7 +7,7 @@ export default class AuthDto {
 
   @ApiProperty()
   email: string;
-  
+
   @ApiProperty()
   accessToken: string;
 
@@ -38,7 +29,7 @@ export class LoginRequest {
   @ApiProperty({
     description: 'email of user',
     type: String,
-    required: true
+    required: true,
   })
   email: string;
 
@@ -47,11 +38,10 @@ export class LoginRequest {
   @ApiProperty({
     description: 'password of user',
     type: String,
-    required: true
+    required: true,
   })
   password: string;
 }
-
 
 export class RefreshTokenRequest {
   @IsMongoId()
@@ -59,7 +49,7 @@ export class RefreshTokenRequest {
   @ApiProperty({
     description: 'id of user',
     type: String,
-    required: true
+    required: true,
   })
   userId: string;
 
@@ -68,11 +58,10 @@ export class RefreshTokenRequest {
   @ApiProperty({
     description: 'refresh token for user',
     type: String,
-    required: true
+    required: true,
   })
   refreshToken: string;
 }
-
 
 export class SignUpRequest {
   @IsEmail()
@@ -80,7 +69,7 @@ export class SignUpRequest {
   @ApiProperty({
     description: 'email of user to be registered',
     type: String,
-    required: true
+    required: true,
   })
   email: string;
 
@@ -89,7 +78,7 @@ export class SignUpRequest {
   @ApiProperty({
     description: 'first name of user to be verified',
     type: String,
-    required: true
+    required: true,
   })
   firstName: string;
 
@@ -98,7 +87,7 @@ export class SignUpRequest {
   @ApiProperty({
     description: 'last name of user to be verified',
     type: String,
-    required: true
+    required: true,
   })
   lastName: string;
 
@@ -107,7 +96,7 @@ export class SignUpRequest {
   @ApiProperty({
     description: 'raw password of user to be verified',
     type: String,
-    required: true
+    required: true,
   })
   password: string;
 }

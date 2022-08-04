@@ -1,18 +1,8 @@
-import {
-  ExecutionContext,
-  HttpException,
-  HttpStatus,
-  Injectable,
-  Logger,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ExecutionContext, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
-import jwt from 'jsonwebtoken';
 
-import { DecodeJwtError } from 'src/exception/jwt.exceptions';
 import JwtUtil from '../../util/jwt.util';
-import SecurityUtil from 'src/security/util/security.util';
 
 @Injectable()
 export default class AdminRouteGuard extends AuthGuard('jwt') {

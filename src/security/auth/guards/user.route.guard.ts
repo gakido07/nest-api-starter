@@ -1,20 +1,9 @@
-import {
-  ExecutionContext,
-  HttpException,
-  HttpStatus,
-  Inject,
-  Injectable,
-  Logger,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ExecutionContext, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import jwt, { Jwt } from 'jsonwebtoken';
 import { Request } from 'express';
 
 import JwtUtil from '../../util/jwt.util';
-import { InvalidGuardForRouteException } from 'src/exception/auth.exceptions';
 import SecurityUtil from 'src/security/util/security.util';
-import { DecodeJwtError } from 'src/exception/jwt.exceptions';
 
 @Injectable()
 export default class UserRouteGuard extends AuthGuard('jwt') {
@@ -24,7 +13,7 @@ export default class UserRouteGuard extends AuthGuard('jwt') {
     super();
   }
 
-  private unauthorizedMessage = "You are unauthorized to access this endpoint";
+  private unauthorizedMessage = 'You are unauthorized to access this endpoint';
 
   canActivate(context: ExecutionContext) {
     const request: Request = context.getArgByIndex(0);

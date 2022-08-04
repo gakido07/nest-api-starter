@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
 
-
 import UserModule from 'src/user/user.module';
 import Admin, { AdminSchema } from './admin';
 import AdminController from './admin.controller';
@@ -14,27 +13,19 @@ import VerificationModule from 'src/verification/verification.module';
 import EmailSender from 'src/config/email/email.sender';
 
 @Module({
-    imports: [
-        MongooseModule.forFeature([
-            { name: Admin.name, schema: AdminSchema },
-        ]),
-        UserModule,
-        JwtModule.register({
-            signOptions: {
-                issuer: 'Nest Api Template',
-                header: { alg: 'HS256', typ: 'JWT' },
-            },
-        }),
-        VerificationModule
-    ],
-    providers: [
-        AdminService,
-        AdminRepository,
-        EmailSender,
-        SecurityUtil,
-        JwtUtil,
-    ],
-    controllers: [AdminController],
-    exports: [AdminService],
+  imports: [
+    MongooseModule.forFeature([{ name: Admin.name, schema: AdminSchema }]),
+    UserModule,
+    JwtModule.register({
+      signOptions: {
+        issuer: 'Nest Api Template',
+        header: { alg: 'HS256', typ: 'JWT' },
+      },
+    }),
+    VerificationModule,
+  ],
+  providers: [AdminService, AdminRepository, EmailSender, SecurityUtil, JwtUtil],
+  controllers: [AdminController],
+  exports: [AdminService],
 })
 export default class AdminModule {}

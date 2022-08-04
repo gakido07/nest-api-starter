@@ -1,10 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  Logger,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { randomUUID } from 'crypto';
 import jwt from 'jsonwebtoken';
@@ -14,7 +8,9 @@ import { InvalidRefreshToken } from 'src/exception/auth.exceptions';
 import { DecodeJwtError } from 'src/exception/jwt.exceptions';
 import { UserDocument } from '../../user/user';
 
-type AppUserDocument = AdminDocument | UserDocument;
+export type AppUserDocument = AdminDocument | UserDocument;
+
+export type ClaimType = 'sub' | 'email' | 'exp' | 'role';
 
 @Injectable()
 export default class JwtUtil {
@@ -63,7 +59,15 @@ export default class JwtUtil {
     return claims;
   }
 
-  extractClaimFromToken(token: string, tokenClaim: 'sub' | 'email' | 'exp' | 'role'): string {
+  extractAllClaimsFromToken(token: string): Claims<AppUserDocument> {
+    const jwtPayload: string | jwt.JwtPayload = this.decodeJwt(token);
+    if (!jwtPayload?.sub) {
+      throw new DecodeJwtError('Invalid token');
+    }
+    return jwtPayload as Claims<AppUserDocument>;
+  }
+
+  extractClaimFromToken(token: string, tokenClaim: ClaimType): string {
     const jwtPayload: string | jwt.JwtPayload = this.decodeJwt(token);
 
     // This checks if the decode function above returns a valid jwt payload

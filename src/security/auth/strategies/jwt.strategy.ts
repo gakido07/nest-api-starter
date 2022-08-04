@@ -1,15 +1,17 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, Logger } from '@nestjs/common';
 import jwt from 'jsonwebtoken';
-import { Request } from 'express';
 
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import JwtUtil, { AppUserDocument, Claims } from 'src/security/util/jwt.util';
+import { CustomRequestContext } from 'src/config/types';
+import { extractTokenFromAuthHeader } from 'src/common/util';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   private readonly logger = new Logger(JwtStrategy.name);
 
-  constructor() {
+  constructor(private jwtUtil: JwtUtil) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       passReqToCallback: true,
@@ -18,7 +20,15 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  async validate(request: Request, payload: jwt.JwtPayload) {
-    return { id: payload.sub, email: payload.email };
+  async validate(
+    request: CustomRequestContext,
+    payload: jwt.JwtPayload
+  ): Promise<Claims<AppUserDocument>> {
+    //lines 27 to 29 append the authenticated user's claims to the request context;
+    const token = extractTokenFromAuthHeader(request.header('Authorization'));
+    request.claims = {
+      ...this.jwtUtil.extractAllClaimsFromToken(token),
+    };
+    return { sub: payload.sub, email: payload.email, role: payload.role };
   }
 }

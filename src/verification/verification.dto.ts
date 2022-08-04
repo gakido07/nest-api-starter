@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsIBAN, IsIn, IsNotEmpty, IsNumber, Max, Min } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsNumber, Max, Min } from 'class-validator';
 
 export class EmailVerificationRequest {
   @IsEmail()
@@ -7,7 +7,7 @@ export class EmailVerificationRequest {
   @ApiProperty({
     description: 'email of user to be verified',
     type: String,
-    required: true
+    required: true,
   })
   email: string;
 }
@@ -18,7 +18,7 @@ export class VerifyCodeRequest {
   @ApiProperty({
     description: 'email of user to be verified',
     type: String,
-    required: true
+    required: true,
   })
   email: string;
 
@@ -30,7 +30,7 @@ export class VerifyCodeRequest {
     description: 'code sent to email',
     type: Number,
     required: true,
-    title: 'Code'
+    title: 'Code',
   })
   code: number;
 }

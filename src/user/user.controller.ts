@@ -1,11 +1,10 @@
-import { Controller, Param, Get, UseGuards, NotFoundException, Headers } from '@nestjs/common';
+import { Controller, Get, UseGuards, NotFoundException, Headers } from '@nestjs/common';
 
 import UserService from './user.service';
 import UserRouteGuard from 'src/security/auth/guards/user.route.guard';
 import { UserDto } from './user.dto';
-import { extractTokenFromAuthHeader } from 'src/common/util';
-import JwtUtil from 'src/security/util/jwt.util';
-import { ApiOkResponse, ApiResponse, getSchemaPath } from '@nestjs/swagger';
+import JwtUtil, { AppUserDocument, Claims } from 'src/security/util/jwt.util';
+import { Claim } from 'src/common/decorators';
 
 @Controller('/users/')
 @UseGuards(UserRouteGuard)
@@ -14,13 +13,12 @@ export default class UserController {
 
   @Get('/')
   async getUserById(
-    @Headers('Authorization') authHeader: string
+    @Headers('Authorization') authHeader: string,
+    @Claim() claims: Claims<AppUserDocument>
   ): Promise<UserDto> {
-    const token = extractTokenFromAuthHeader(authHeader);
-    const id  = this.jwtUtil.extractClaimFromToken(token, 'sub');
     return new UserDto(
       await this.userService.findUserById({
-        id: id,
+        id: claims.sub,
         exception: new NotFoundException('User not found'),
       })
     );

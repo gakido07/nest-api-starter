@@ -1,6 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { hash, compare } from 'bcrypt';
-import { InvalidGuardForRouteException } from 'src/exception/auth.exceptions';
 
 interface PasswordEncoder {
   encode(rawPassword: string): Promise<string>;
