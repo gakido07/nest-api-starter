@@ -4,7 +4,7 @@
 ## CONFIGURED WITH:
 - Email Sender with nodemailer
 - Email Verification
-- Role based authentication
+- Role based authorization
 - Secure user and admin routes 
 - Jwt authentication with refresh token
 - Logging Middleware
