@@ -9,9 +9,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['warn', 'error', 'debug', 'log', 'verbose'],
   });
+  app.useGlobalPipes(new ValidationPipe());
 
   if (process.env.NODE_ENV !== 'production') {
-    app.useGlobalPipes(new ValidationPipe());
     const config = new DocumentBuilder()
       .setTitle('Nest Api Template')
       .setDescription('Nest Api Template')
