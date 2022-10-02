@@ -1,0 +1,7 @@
+services: 
+  app:
+    image: nest-mongoose-api-template
+    depends_on:
+      - mongo
+  mongo:
+    image: mongo
