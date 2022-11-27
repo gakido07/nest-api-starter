@@ -1,4 +1,4 @@
-# NEST MONGOOSE API TEMPLATE
+# NEST API STARTER
   This Template uses MongoDB database with mongoose ORM via [@nestjs/mongoose](https://github.com/nestjs/mongoose "@nestjs/mongoose")
 
 ## CONFIGURED WITH:
