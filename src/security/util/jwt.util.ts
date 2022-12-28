@@ -4,7 +4,6 @@ import { randomUUID } from 'crypto';
 import jwt from 'jsonwebtoken';
 
 import { AdminDocument } from 'src/admin/admin';
-import { InvalidRefreshToken } from 'src/exception/auth.exceptions';
 import { DecodeJwtError } from 'src/exception/jwt.exceptions';
 import { UserDocument } from '../../user/user';
 
