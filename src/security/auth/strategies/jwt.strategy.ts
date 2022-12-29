@@ -24,7 +24,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     request: CustomRequestContext,
     payload: jwt.JwtPayload
   ): Promise<Claims<AppUserDocument>> {
-    //lines 27 to 29 append the authenticated user's claims to the request context;
     const token = extractTokenFromAuthHeader(request.header('Authorization'));
     request.claims = {
       ...this.jwtUtil.extractAllClaimsFromToken(token),

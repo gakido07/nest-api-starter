@@ -83,14 +83,14 @@ export default class AuthService {
   }
 
   async signUpUser(signUpRequest: SignUpRequest): Promise<UserDto> {
-    return await this.userService.signUpUser(signUpRequest);
+    return this.userService.signUpUser(signUpRequest);
   }
 
   async verifyCode(info: string, code: number): Promise<Verification> {
-    return await this.verificationService.verifyCode(info, code);
+    return this.verificationService.verifyCode(info, code);
   }
 
   async sendEmailVerificationMail(email: string): Promise<string> {
-    return await this.verificationService.sendVerificationEmail(email);
+    return this.verificationService.sendVerificationEmail(email);
   }
 }

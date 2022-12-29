@@ -9,16 +9,16 @@ export default class AdminRepository {
   constructor(@InjectModel(Admin.name) private adminModel: Model<AdminDocument>) {}
 
   async findAdminById(id: string): Promise<AdminDocument> {
-    return await this.adminModel.findById(id);
+    return this.adminModel.findById(id);
   }
 
   async findAdminByEmail(email: string): Promise<AdminDocument> {
-    return await this.adminModel.findOne({ email: email });
+    return this.adminModel.findOne({ email: email });
   }
 
   async saveAdmin(admin: Admin): Promise<AdminDocument> {
     const newAdmin = new this.adminModel(admin);
-    return await newAdmin.save();
+    return newAdmin.save();
   }
 
   async lockAdminAccount(email: string): Promise<AdminDocument> {

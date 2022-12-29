@@ -26,7 +26,7 @@ export default class EmailSender {
     subject: string,
     html: string
   ): Promise<SMTPTransport.SentMessageInfo> {
-    return await this.createTransport().sendMail({
+    return this.createTransport().sendMail({
       from: process.env.apiEmailAddress,
       to: email,
       subject: subject,

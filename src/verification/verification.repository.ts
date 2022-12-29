@@ -17,11 +17,11 @@ export default class VerificationRepository {
 
   async saveVerificationRecord(verification: Verification): Promise<Verification> {
     const newVerificationRecord = new this.verificationModel(verification);
-    return await newVerificationRecord.save();
+    return newVerificationRecord.save();
   }
 
   async findVerificationRecord(data: string): Promise<Verification> {
-    return await this.verificationModel.findOne({ data: data });
+    return this.verificationModel.findOne({ data: data });
   }
   async deleteVerificationRecordByData(data: string): Promise<void> {
     await this.verificationModel.deleteOne({ data: data });

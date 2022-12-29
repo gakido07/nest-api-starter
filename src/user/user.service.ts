@@ -49,7 +49,7 @@ export default class UserService {
   }
 
   async userExists(email: string): Promise<boolean> {
-    return await this.userRepository.userEmailExists(email);
+    return this.userRepository.userEmailExists(email);
   }
 
   async signUpUser(signUpRequest: SignUpRequest): Promise<UserDto> {

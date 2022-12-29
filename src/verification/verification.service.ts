@@ -25,7 +25,7 @@ export default class VerificationService {
   }
 
   async verificationRecordExists(data: string): Promise<boolean> {
-    return await this.verificationRepository.verificationRecordExists(data);
+    return this.verificationRepository.verificationRecordExists(data);
   }
 
   async verifyCode(data: string, verificationCode: number): Promise<Verification> {
@@ -37,7 +37,7 @@ export default class VerificationService {
     }
 
     verificationRecord.verified = true;
-    return await this.verificationRepository.saveVerificationRecord(verificationRecord);
+    return this.verificationRepository.saveVerificationRecord(verificationRecord);
   }
 
   async loadVerificationRecord(data: string): Promise<Verification> {

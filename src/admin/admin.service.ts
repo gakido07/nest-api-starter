@@ -17,7 +17,7 @@ export default class AdminService {
   ) {}
 
   async findAdminById(id: string): Promise<AdminDocument> {
-    return await this.adminRepository.findAdminById(id);
+    return this.adminRepository.findAdminById(id);
   }
 
   async signUpAdmin(signUpAdminRequest: SignUpAdminRequest): Promise<Admin> {
@@ -37,7 +37,7 @@ export default class AdminService {
 
     await this.emailVerificationService.deleteVerificationRecord(email);
 
-    return await this.adminRepository.saveAdmin(admin);
+    return this.adminRepository.saveAdmin(admin);
   }
 
   async findAdminByEmail(email: string): Promise<AdminDocument> {

@@ -9,16 +9,16 @@ export default class UserRepository {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
   async findUserByEmail(email: string): Promise<UserDocument> {
-    return await this.userModel.findOne({ email: email });
+    return this.userModel.findOne({ email: email });
   }
 
   async findUserById(id: string): Promise<UserDocument> {
-    return await this.userModel.findById(id);
+    return this.userModel.findById(id);
   }
 
   async saveUser(user: User): Promise<UserDocument> {
     const newUser = new this.userModel(user);
-    return await newUser.save();
+    return newUser.save();
   }
 
   async deleteUserByEmail(email: string): Promise<void> {

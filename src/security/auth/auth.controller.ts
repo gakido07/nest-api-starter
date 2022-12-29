@@ -16,12 +16,12 @@ export default class AuthController {
 
   @Post('/login')
   async authenticate(@Body() loginRequest: LoginRequest): Promise<AuthDto> {
-    return await this.authService.authenticateUser(loginRequest);
+    return this.authService.authenticateUser(loginRequest);
   }
 
   @Post('/admin/login')
   async authenticateAdmin(@Body() loginRequest: LoginRequest): Promise<AdminAuthDto> {
-    return await this.authService.authenticateAdmin(loginRequest);
+    return this.authService.authenticateAdmin(loginRequest);
   }
 
   @Post('/verification/email')
@@ -30,23 +30,23 @@ export default class AuthController {
     @Body() emailVerificationRequest: EmailVerificationRequest
   ): Promise<string> {
     const { email } = emailVerificationRequest;
-    return await this.authService.sendEmailVerificationMail(email);
+    return this.authService.sendEmailVerificationMail(email);
   }
 
   @Post('/verification/email/verify-code')
   async verifyCode(@Body() request: VerifyCodeRequest): Promise<Verification> {
     const { email, code } = request;
-    return await this.authService.verifyCode(email, code);
+    return this.authService.verifyCode(email, code);
   }
 
   @Post('/sign-up')
   async signUp(@Body() request: SignUpRequest): Promise<UserDto> {
-    return await this.authService.signUpUser(request);
+    return this.authService.signUpUser(request);
   }
 
   @Post('/refresh-token')
   async refreshToken(@Body() request: RefreshTokenRequest): Promise<{ accessToken: string }> {
     const { userId, refreshToken } = request;
-    return await this.authService.refreshToken(refreshToken, userId);
+    return this.authService.refreshToken(refreshToken, userId);
   }
 }
