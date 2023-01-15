@@ -1,4 +1,4 @@
-FROM node:18
+FROM node:16
 
 WORKDIR /usr/src/app
 
@@ -8,6 +8,6 @@ RUN npm install
 
 COPY . .
 
-RUN npm run build
+EXPOSE 8080
 
-CMD [ "node", "dist/main.js" ]
+CMD ["npm", "run", "start"]

@@ -25,10 +25,7 @@ export default class UserRouteGuard extends AuthGuard('jwt') {
       this.logger.error('Unable to extract jwt for request');
       throw new UnauthorizedException(this.unauthorizedMessage);
     }
-
-    const sub = this.jwtUtil.extractClaimFromToken(token, 'sub');
     const role = this.jwtUtil.extractClaimFromToken(token, 'role');
-
     if (role !== 'USER') {
       throw new UnauthorizedException(this.unauthorizedMessage);
     }

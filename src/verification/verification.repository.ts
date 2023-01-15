@@ -24,6 +24,6 @@ export default class VerificationRepository {
     return this.verificationModel.findOne({ data: data });
   }
   async deleteVerificationRecordByData(data: string): Promise<void> {
-    await this.verificationModel.deleteOne({ data: data });
+    this.verificationModel.deleteOne({ data: data });
   }
 }

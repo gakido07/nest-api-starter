@@ -8,13 +8,11 @@ interface PasswordEncoder {
 
 @Injectable()
 export default class SecurityUtil {
-  // This file is left for possible grouping of all security utility functions like password encoder etc.
-
   passwordEncoder(): PasswordEncoder {
     return {
-      encode: async (rawPassword: string): Promise<string> => await hash(rawPassword, 12),
+      encode: async (rawPassword: string): Promise<string> => hash(rawPassword, 12),
       match: async (rawPassword: string, hash: string): Promise<boolean> =>
-        await compare(rawPassword, hash),
+        compare(rawPassword, hash),
     };
   }
 
